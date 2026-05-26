@@ -4,7 +4,7 @@ This project aims to develop an AI-powered smart tutor by leveraging advanced pr
 
 **Status:** planning
 **Domain:** Education Technology
-**Progress:** 0%
+**Progress:** 94%
 
 ---
 *Synced from Zaby LMS Capstone Workspace*
