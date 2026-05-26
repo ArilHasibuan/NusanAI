@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="images/logo.png">
+  <title>NusanAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    [data-theme="dark"] {
+      --bg-overlay:      rgba(8,8,16,0.65);
+      --bg-overlay-chat: rgba(8,8,16,0.78);
+      --gold:            #7c6aff;
+      --gold-lt:         #a99fff;
+      --gold-dk:         #4a3acc;
+      --gold-a:          #6c5ce7;
+      --gold-b:          #4a3acc;
+      --bubble-user-a:   #6c5ce7;
+      --bubble-user-b:   #4a3acc;
+      --bubble-user-txt: #f0eeff;
+      --bubble-ai-bg:    rgba(124,106,255,0.06);
+      --bubble-ai-bdr:   rgba(124,106,255,0.18);
+      --bubble-ai-txt:   #f0eeff;
+      --input-bg:        rgba(20,18,40,0.6);
+      --input-bdr:       rgba(124,106,255,0.22);
+      --input-bdr-focus: rgba(124,106,255,0.55);
+      --input-txt:       #f0eeff;
+      --input-ph:        rgba(124,106,255,0.38);
+      --chip-bg:         rgba(124,106,255,0.09);
+      --chip-bdr:        rgba(124,106,255,0.22);
+      --chip-txt:        #a99fff;
+      --header-txt:      #c4b9ff;
+      --title-txt:       #f0eeff;
+      --copy-bg:         rgba(124,106,255,0.12);
+      --copy-hover:      rgba(124,106,255,0.25);
+      --card-bg:         rgba(124,106,255,0.06);
+      --card-bdr:        rgba(124,106,255,0.18);
+      --icon-btn-bg:     rgba(124,106,255,0.09);
+      --icon-btn-hover:  rgba(124,106,255,0.18);
+      --scrollbar:       rgba(124,106,255,0.28);
+      --dropdown-bg:     #12102a;
+      --dropdown-hover:  #1e1c3a;
+      --sidebar-bg:      rgba(8,8,20,0.92);
+      --sidebar-border:  rgba(124,106,255,0.18);
+      --tooltip-bg:      rgba(30,28,58,0.97);
+    }
+    [data-theme="light"] {
+      --bg-overlay:      rgba(235,230,255,0.45);
+      --bg-overlay-chat: rgba(235,230,255,0.62);
+      --gold:            #5b4fcf;
+      --gold-lt:         #3d2fa0;
+      --gold-dk:         #7c6aff;
+      --gold-a:          #6c5ce7;
+      --gold-b:          #4a3acc;
+      --bubble-user-a:   #6c5ce7;
+      --bubble-user-b:   #4a3acc;
+      --bubble-user-txt: #f0eeff;
+      --bubble-ai-bg:    rgba(255,255,255,0.65);
+      --bubble-ai-bdr:   rgba(91,79,207,0.25);
+      --bubble-ai-txt:   #1a1640;
+      --input-bg:        rgba(255,255,255,0.65);
+      --input-bdr:       rgba(91,79,207,0.28);
+      --input-bdr-focus: rgba(91,79,207,0.65);
+      --input-txt:       #1a1640;
+      --input-ph:        rgba(91,79,207,0.4);
+      --chip-bg:         rgba(255,255,255,0.5);
+      --chip-bdr:        rgba(91,79,207,0.28);
+      --chip-txt:        #4a3acc;
+      --header-txt:      #4a3acc;
+      --title-txt:       #1a1640;
+      --copy-bg:         rgba(91,79,207,0.1);
+      --copy-hover:      rgba(91,79,207,0.22);
+      --card-bg:         rgba(255,255,255,0.55);
+      --card-bdr:        rgba(91,79,207,0.2);
+      --icon-btn-bg:     rgba(91,79,207,0.09);
+      --icon-btn-hover:  rgba(91,79,207,0.18);
+      --scrollbar:       rgba(91,79,207,0.28);
+      --dropdown-bg:     #ffffffee;
+      --dropdown-hover:  #edeaff;
+      --sidebar-bg:      rgba(240,238,255,0.96);
+      --sidebar-border:  rgba(91,79,207,0.18);
+      --tooltip-bg:      rgba(255,255,255,0.97);
+    }
+
+    html, body { height:100%; margin:0; overflow:hidden; font-family: 'Inter', sans-serif; }
+    #welcome h1 { font-family: 'Space Grotesk', sans-serif; }
+
+    /* ── SCROLLBAR ── */
+    #chat-outer { scrollbar-width:thin; scrollbar-color:var(--scrollbar) transparent; }
+    #chat-outer::-webkit-scrollbar { width:4px; }
+    #chat-outer::-webkit-scrollbar-track { background:transparent; }
+    #chat-outer::-webkit-scrollbar-thumb { background:var(--scrollbar); border-radius:99px; }
+
+    #overlay { background:var(--bg-overlay); transition:background 0.5s; }
+
+    /* ══════════════════════════════
+       SIDEBAR — icon-rail style
+    ══════════════════════════════ */
+    #sidebar {
+      position: fixed; left:0; top:0; bottom:0;
+      width: 56px; background: var(--sidebar-bg);
+      backdrop-filter: blur(20px); border-right: 1px solid var(--sidebar-border);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0; gap: 4px; z-index: 100;
+      transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
+      /* HAPUS overflow: hidden */
+      overflow: visible;
+    }
+    #sidebar.expanded { width: 220px; }
+
+    /* top toggle btn */
+    #sidebar-toggle {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--chip-bdr);
+      background: var(--icon-btn-bg);
+      color: var(--chip-txt);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+      margin-bottom: 8px;
+    }
+    #sidebar-toggle:hover { background:var(--icon-btn-hover); border-color:var(--gold); }
+
+    /* divider */
+    .sidebar-divider {
+      width: 32px; height: 1px;
+      background: var(--sidebar-border);
+      margin: 4px 0;
+      transition: width 0.28s;
+      flex-shrink: 0;
+    }
+    #sidebar.expanded .sidebar-divider { width: 180px; }
+    #sidebar.expanded .nav-item { width: 192px; }
+
+    /* nav items */
+    .nav-item {
+      position: relative;
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--chip-txt);
+      display: flex; align-items: center;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, width 0.28s;
+      text-decoration: none;
+      flex-shrink: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 0 10px;
+      gap: 12px;
+    }
+    .nav-item:hover {
+      background: var(--icon-btn-hover);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .nav-item.active {
+      background: var(--copy-bg);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+  
+    .nav-item svg, .nav-item i {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+      stroke: currentColor;
+    }
+    .nav-label { font-size: 0.82rem; font-weight: 500; opacity: 0; transition: opacity 0.18s; font-family: 'Inter', sans-serif;}
+    #sidebar.expanded .nav-label { opacity: 1; pointer-events: auto; }
+
+    /* tooltip saat collapsed */
+    .nav-tooltip {
+      position: fixed;
+      background: var(--tooltip-bg);
+      border: 1px solid var(--chip-bdr);
+      color: var(--chip-txt);
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-weight: 500;
+    }
+
+#sidebar:not(.expanded) .nav-item:hover .nav-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+#sidebar.expanded .nav-tooltip { display: none; }
+    #sidebar:not(.expanded) .nav-item:hover .nav-tooltip { opacity: 1; }
+    #sidebar.expanded .nav-tooltip { display: none; }
+
+    /* bottom section */
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    /* ── MAIN wrapper shifts right when sidebar expands on desktop ── */
+    #mainContainer {
+      margin-left: 56px;
+      transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.sidebar-open #mainContainer { margin-left: 220px; }
+
+    /* ── HEADER ── */
+    #header-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.14em;
+      color: var(--header-txt);
+      text-shadow: 0 0 24px rgba(124,106,255,0.3);
+    }
+
+    .header-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dk), transparent);
+      opacity: 0.4;
+      margin: 0 1.5rem;
+    }
+    .icon-btn {
+      background:var(--icon-btn-bg); border:1px solid var(--chip-bdr);
+      border-radius:9px; padding:5px 9px; cursor:pointer; font-size:13px;
+      color:var(--chip-txt); transition:background 0.2s;
+      display:flex; align-items:center; gap:5px;
+      white-space:nowrap; font-family:'DM Sans',sans-serif;
+      text-decoration:none;
+    }
+    .icon-btn:hover { background:var(--icon-btn-hover); }
+
+    /* ── WELCOME ── */
+    #welcome h1 {
+      font-family:'Playfair Display',serif;
+      font-size:1.55rem; font-weight:500;
+      color:var(--title-txt); line-height:1.45;
+      text-shadow:0 2px 16px rgba(0,0,0,0.3);
+    }
+    .chip {
+      font-family:'DM Sans',sans-serif; font-size:0.78rem;
+      color:var(--chip-txt); background:var(--chip-bg);
+      border:1px solid var(--chip-bdr); padding:7px 14px;
+      border-radius:999px; cursor:pointer;
+      transition:background 0.2s,border-color 0.2s,transform 0.15s;
+      backdrop-filter:blur(4px); white-space:nowrap;
+    }
+    .chip:hover { background:var(--copy-hover); border-color:var(--gold); transform:translateY(-1px); }
+    .chip:active { transform:scale(0.97); }
+
+    /* ── BUBBLES ── */
+    .bubble-user-wrap { align-self:flex-end; width:100%; display:flex; flex-direction:column; align-items:flex-end; }
+    .bubble-user-wrap .copy-btn { align-self: flex-end; }
+    .bubble-user-wrap .copy-btn,
+    .bubble-ai-wrap .copy-btn {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .bubble-user-wrap:hover .copy-btn,
+    .bubble-ai-wrap:hover .copy-btn {
+      opacity: 1;
+    }
+    .bubble-user {
+      background:linear-gradient(135deg,var(--bubble-user-a),var(--bubble-user-b));
+      color:var(--bubble-user-txt); border-radius:18px 18px 4px 18px;
+      padding:12px 16px; font-size:0.9rem; line-height:1.55;
+      box-shadow:0 2px 12px rgba(0,0,0,0.3); word-break:break-word;
+      max-width:85%; width:fit-content;
+    }
+    .bubble-ai-wrap { align-self:flex-start; width:100%; display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+    .bubble-ai {
+      background:var(--bubble-ai-bg); border:1px solid var(--bubble-ai-bdr);
+      color:var(--bubble-ai-txt); border-radius:18px 18px 18px 4px;
+      padding:12px 16px; font-size:0.9rem; line-height:1.6;
+      backdrop-filter:blur(6px); box-shadow:0 2px 12px rgba(0,0,0,0.2);
+      max-width:85%; width:fit-content;
+    }
+    .bubble-ai hr {
+      margin: 4px 0 !important;
+    }
+    /* Solusi untuk membatasi konten dalam bubble */
+.bubble-user,
+.bubble-ai {
+  word-wrap: break-word;          /* Memecah kata panjang */
+  word-break: break-word;         /* Memecah kata jika perlu */
+  overflow-wrap: break-word;      /* Memecah kata panjang */
+  white-space: normal;            /* Memastikan teks normal */
+  max-width: 85%;                 /* Batas maksimum lebar */
+  width: fit-content;             /* Lebar sesuai konten */
+  min-width: 40px;                /* Lebar minimum */
+}
+
+/* Untuk konten yang sangat panjang seperti kode atau URL */
+.bubble-user pre,
+.bubble-ai pre,
+.bubble-user code,
+.bubble-ai code {
+  white-space: pre-wrap;          /* Memecah baris kode panjang */
+  word-break: break-all;          /* Memecah kata kode */
+  max-width: 100%;                /* Tidak melebihi bubble */
+  overflow-x: auto;               /* Scroll horizontal jika perlu */
+  display: block;
+}
+
+/* Untuk tabel atau elemen lebar lainnya */
+.bubble-user table,
+.bubble-ai table,
+.bubble-user div,
+.bubble-ai div {
+  max-width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Untuk gambar dalam bubble */
+.bubble-user img,
+.bubble-ai img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Memastikan konten inline tidak overflow */
+.bubble-user *,
+.bubble-ai * {
+  max-width: 100%;
+  word-wrap: break-word;
+}
+    .level-badge {
+      display:inline-block; font-size:0.65rem; padding:2px 8px;
+      border-radius:999px; border:1px solid var(--chip-bdr);
+      color:var(--gold); background:var(--chip-bg);
+      letter-spacing:0.05em; font-family:'DM Sans',sans-serif;
+    }
+    .copy-btn {
+      background:var(--copy-bg); border:none; border-radius:6px; padding:3px 9px;
+      font-size:11px; color:var(--gold); cursor:pointer;
+      transition:background 0.2s; font-family:'DM Sans',sans-serif; display:flex; align-items:center; gap:4px;
+    }
+    .copy-btn:hover { background:var(--copy-hover); opacity:1; }
+
+    /* ── TYPING ── */
+    .typing-indicator {
+      display:flex; align-items:center; gap:5px; padding:12px 16px;
+      background:var(--bubble-ai-bg); border:1px solid var(--bubble-ai-bdr);
+      border-radius:18px 18px 18px 4px; width:fit-content; backdrop-filter:blur(6px);
+    }
+    .typing-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--gold); opacity:0.4;
+      animation:typingBounce 1.2s infinite ease-in-out;
+    }
+    .typing-dot:nth-child(1){animation-delay:0s}
+    .typing-dot:nth-child(2){animation-delay:0.2s}
+    .typing-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
+
+    /* ── INPUT ── */
+    #input-wrapper {
+      background:var(--input-bg); border:1px solid var(--input-bdr);
+      border-radius:20px; backdrop-filter:blur(12px);
+      transition:border-color 0.2s;
+      display:flex; flex-direction:column; padding:8px 12px;
+    }
+    #input-wrapper:focus-within { border-color:var(--input-bdr-focus); }
+    #question {
+      color:var(--input-txt); font-family:'DM Sans',sans-serif;
+      font-size:0.88rem; background:transparent; outline:none;
+      width:100%; padding:8px 0 4px 0;
+    }
+    #question::placeholder { color:var(--input-ph); }
+    .input-actions {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-top:6px; flex-wrap:wrap;
+    }
+    .level-dropdown { position:relative; }
+    .dropdown-trigger {
+      background:var(--chip-bg); border:1px solid var(--chip-bdr);
+      border-radius:40px; padding:6px 12px; font-size:0.75rem; font-weight:500;
+      color:var(--gold); display:flex; align-items:center; gap:8px;
+      cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif;
+      backdrop-filter:blur(4px);
+    }
+    .dropdown-trigger:hover { background:var(--copy-hover); border-color:var(--gold); }
+    .dropdown-menu {
+      position:absolute; bottom:130%; left:0;
+      background:var(--dropdown-bg); backdrop-filter:blur(20px);
+      border:1px solid var(--card-bdr); border-radius:20px;
+      padding:8px 0; min-width:200px; z-index:50;
+      box-shadow:0 12px 28px rgba(0,0,0,0.4);
+      display:none; flex-direction:column;
+    }
+    .dropdown-menu.show { display:flex; }
+    .level-option {
+      padding:10px 16px; display:flex; flex-direction:column; gap:2px;
+      cursor:pointer; transition:background 0.15s;
+    }
+    .level-option:hover { background:var(--dropdown-hover); }
+    .level-option .option-name { font-weight:600; font-size:0.85rem; color:var(--title-txt); }
+    .level-option .option-desc { font-size:0.65rem; opacity:0.65; color:var(--chip-txt); }
+    .level-option.selected { background:var(--copy-hover); border-left:3px solid var(--gold); }
+    #send-btn {
+      background:linear-gradient(135deg,var(--bubble-user-a),var(--bubble-user-b));
+      border:none; border-radius:32px; width:36px; height:36px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:opacity 0.2s,transform 0.15s; flex-shrink:0;
+    }
+    #send-btn:hover { opacity:0.88; transform:scale(1.05); }
+    #send-btn:active { transform:scale(0.95); }
+    #send-btn svg { width:15px; height:15px; fill:#f0eeff; }
+
+    .stream-cursor::after { content:'▍'; animation:blink 0.7s infinite; color:var(--gold); font-size:0.8em; }
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+    /* Modal button styles */
+.modal-cancel, .modal-delete {
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.modal-cancel {
+  flex: 1;
+  padding: 9px;
+  border-radius: 10px;
+  border: 1px solid var(--chip-bdr);
+  background: var(--icon-btn-bg);
+  color: var(--chip-txt);
+}
+
+.modal-cancel:hover {
+  background: var(--copy-hover) !important;
+  border-color: var(--gold) !important;
+  transform: translateY(-1px) !important;
+}
+
+.modal-cancel:active {
+  transform: translateY(1px) !important;
+}
+
+.modal-delete {
+  flex: 1;
+  padding: 9px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #b94040, #8a2020);
+  color: #fff;
+  border: none;
+}
+
+.modal-delete:hover {
+  background: linear-gradient(135deg, #d44, #9a2020) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(185, 64, 64, 0.4) !important;
+}
+
+.modal-delete:active {
+  transform: translateY(1px) !important;
+}
+  </style>
+  <script>
+  const savedTheme =
+    localStorage.getItem("learnai-theme") || "dark";
+
+  document.documentElement.setAttribute(
+    "data-theme",
+    savedTheme
+  );
+</script>
+</head>
+
+<body class="relative text-white" style="height:100vh;">
+
+<!-- BACKGROUND -->
+<div class="absolute inset-0">
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a1a,#12102a,#0d0a1f);"></div>
+</div>
+<div id="overlay" class="absolute inset-0"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar">
+
+  <!-- Toggle button -->
+  <button id="sidebar-toggle" onclick="toggleSidebar()" title="Open / Close Sidebar">
+    <i data-lucide="panel-left" style="width:16px;height:16px;stroke:currentColor;"></i>
+  </button>
+
+  <div class="sidebar-divider"></div>
+
+  <!-- Nav items -->
+  <a href="index.html" class="nav-item active">
+    <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+    <span class="nav-label">Chat</span>
+    <span class="nav-tooltip">Chat</span>
+  </a>
+
+  <a href="quiz.html" class="nav-item">
+    <i data-lucide="brain" style="width:16px;height:16px;"></i>
+    <span class="nav-label">Quiz</span>
+    <span class="nav-tooltip">Quiz</span>
+  </a>
+
+  <a href="studyplan.html" class="nav-item">
+    <i data-lucide="calendar" style="width:16px;height:16px;"></i>
+    <span class="nav-label">Study Plan</span>
+    <span class="nav-tooltip">Study Plan</span>
+  </a>
+
+  <a href="evaluator.html" class="nav-item">
+    <i data-lucide="clipboard-check" style="width:16px;height:16px;"></i>
+    <span class="nav-label">Evaluator</span>
+    <span class="nav-tooltip">Evaluator</span>
+  </a>
+
+  <a href="compare.html" class="nav-item">
+    <i data-lucide="git-compare" style="width:16px;height:16px;"></i>
+    <span class="nav-label">Compare Prompt</span>
+    <span class="nav-tooltip">Compare Prompt</span>
+  </a>
+
+  <!-- Bottom: theme toggle + new chat -->
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider"></div>
+
+    <button id="clear-btn" class="nav-item" onclick="clearChat()"
+            style="display:none;opacity:0;transition:opacity 0.3s;border:none;">
+      <i data-lucide="plus" style="width:16px;height:16px;"></i>
+      <span class="nav-label">New Chat</span>
+      <span class="nav-tooltip">New Chat</span>
+    </button>
+
+    <button class="nav-item" onclick="toggleTheme()" style="border:none;">
+      <span id="theme-icon" style="display:inline-flex;align-items:center;flex-shrink:0;transition:transform 0.45s cubic-bezier(.34,1.56,.64,1),opacity 0.3s;">
+        <i data-lucide="sun" style="width:16px;height:16px;stroke:currentColor;"></i>
+      </span>
+      <span class="nav-label">Change Theme</span>
+      <span class="nav-tooltip">Change Theme</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="relative flex flex-col" id="mainContainer" style="height:100vh;">
+
+  <!-- HEADER - ukuran konsisten dengan halaman lain -->
+  <div class="pt-4 pb-3 px-4 flex-shrink-0" style="position:relative;display:flex;align-items:center;min-height:64px;">
+    <div id="header-title" class="absolute left-1/2 transform -translate-x-1/2 pointer-events-none whitespace-nowrap">
+      NusanAI
+    </div>
+  </div>
+  <div class="header-line flex-shrink-0"></div>
+
+  <!-- CONTENT -->
+  <div id="mainContent" class="flex-1 flex flex-col overflow-hidden min-h-0">
+
+    <!-- WELCOME -->
+    <div id="welcome" class="flex flex-col items-center justify-center flex-1 text-center px-6 gap-5">
+      <img src="images/logo.png" class="w-20 h-20 drop-shadow-xl transition duration-500 hover:scale-110"
+           style="filter:drop-shadow(0 0 16px rgba(124,106,255,0.5));">
+      <h1 style="font-family: 'Space Grotesk', sans-serif;"><b>Hi, What do you want to learn today?</b></h1>
+      <p style="color:var(--chip-txt);font-size:0.82rem;opacity:0.7;max-width:400px;">
+        Choose a response style in the chat box, then ask your question
+      </p>
+      <div id="chips" class="flex flex-wrap gap-2 justify-center max-w-lg"></div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat-outer" class="flex-1 overflow-y-auto min-h-0" style="display:none;">
+      <div id="chat" class="flex flex-col gap-3 pt-5 pb-4 px-4 max-w-2xl mx-auto w-full"></div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="p-4 flex-shrink-0">
+    <div id="input-wrapper" class="max-w-2xl mx-auto">
+      <input id="question" placeholder="Ask anything" autocomplete="off"/>
+      <div class="input-actions">
+        <!-- Level dropdown -->
+        <div class="level-dropdown" id="levelDropdown">
+          <div class="dropdown-trigger" id="dropdownTrigger">
+            <span id="selectedLevelName" style="display:flex;align-items:center;gap:6px;">
+              <i style="width:14px;height:14px;"></i> Beginner
+            </span>
+            <i data-lucide="chevron-up" style="width:14px;height:14px;"></i>
+          </div>
+
+          <div class="dropdown-menu" id="dropdownMenu">
+            <div class="level-option" data-level="beginner">
+              <div class="option-name">Beginner</div>
+              <div class="option-desc">Basic and simple explanations using everyday analogies</div>
+            </div>
+
+            <div class="level-option selected" data-level="intermediate">
+              <div class="option-name">Intermediate</div>
+              <div class="option-desc">Structured explanations with practical examples</div>
+            </div>
+
+            <div class="level-option" data-level="advanced">
+              <div class="option-name">Advanced</div>
+              <div class="option-desc">Academic, in-depth, and critically analytical</div>
+            </div>
+          </div>
+        </div>
+
+        <button id="send-btn" onclick="tanya()">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════ SIDEBAR ════
+let sidebarOpen = localStorage.getItem("sidebar-open") === "true";
+
+function applySidebar() {
+  const sb = document.getElementById("sidebar");
+  if (sidebarOpen) { sb.classList.add("expanded"); document.body.classList.add("sidebar-open"); }
+  else             { sb.classList.remove("expanded"); document.body.classList.remove("sidebar-open"); }
+}
+applySidebar();
+
+function toggleSidebar() {
+  sidebarOpen = !sidebarOpen;
+  localStorage.setItem("sidebar-open", sidebarOpen);
+  applySidebar();
+}
+
+// ════ LEVEL ════
+let currentLevel = localStorage.getItem("tutor-level") || "intermediate";
+const LEVEL_ICONS = { beginner:"zap", intermediate:"brain", advanced:"crown" };
+const LEVEL_LABELS = { beginner:"Beginner", intermediate:"Intermediate", advanced:"Advanced" };
+
+function updateLevelUI() {
+  const icon  = LEVEL_ICONS[currentLevel] || "brain";
+  const label = LEVEL_LABELS[currentLevel] || "Intermediate";
+  const el = document.getElementById("selectedLevelName");
+  if(el) { el.innerHTML = `<i data-lucide="${icon}" style="width:14px;height:14px;"></i> ${label}`; lucide.createIcons({nodes:[el]}); }
+  document.querySelectorAll(".level-option").forEach(o => {
+    o.classList.toggle("selected", o.dataset.level === currentLevel);
+  });
+}
+setTimeout(updateLevelUI, 80);
+
+function setLevel(lv) {
+  if(!LEVEL_LABELS[lv]) return;
+  currentLevel = lv;
+  localStorage.setItem("tutor-level", lv);
+  updateLevelUI();
+  document.getElementById("dropdownMenu").classList.remove("show");
+}
+
+// dropdown clicks
+document.addEventListener("click", e => {
+  const trigger = document.getElementById("dropdownTrigger");
+  const menu    = document.getElementById("dropdownMenu");
+  const dropdown = document.getElementById("levelDropdown");
+  if(!trigger||!menu) return;
+  if(trigger.contains(e.target)) { e.stopPropagation(); menu.classList.toggle("show"); }
+  else if(!dropdown.contains(e.target)) menu.classList.remove("show");
+});
+document.querySelectorAll(".level-option").forEach(o =>
+  o.addEventListener("click", e => { e.stopPropagation(); setLevel(o.dataset.level); })
+);
+
+// ════ THEME ════
+let currentTheme =
+  document.documentElement.getAttribute("data-theme");
+
+function toggleTheme() {
+  currentTheme = currentTheme==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme", currentTheme);
+  localStorage.setItem("tutor-theme", currentTheme);
+  updateThemeIcon(true);
+}
+function updateThemeIcon(animate) {
+  const span = document.getElementById("theme-icon");
+  if(!span) return;
+  const next = currentTheme==="dark"
+    ? `<i data-lucide="sun"  style="width:16px;height:16px;stroke:currentColor;"></i>`
+    : `<i data-lucide="moon" style="width:16px;height:16px;stroke:currentColor;"></i>`;
+  if(animate) {
+    span.style.transform="rotate(180deg) scale(0)"; span.style.opacity="0";
+    setTimeout(()=>{
+      span.innerHTML=next; lucide.createIcons({nodes:[span]});
+      span.style.transition="none"; span.style.transform="rotate(-180deg) scale(0)"; span.style.opacity="0";
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        span.style.transition="transform 0.45s cubic-bezier(.34,1.56,.64,1),opacity 0.3s";
+        span.style.transform="rotate(0deg) scale(1)"; span.style.opacity="1";
+      }));
+    },180);
+  } else { span.innerHTML=next; lucide.createIcons({nodes:[span]}); }
+}
+updateThemeIcon(false);
+
+// ════ CHAT CORE ════
+const chatOuter = document.getElementById("chat-outer");
+const chat      = document.getElementById("chat");
+const welcome   = document.getElementById("welcome");
+const overlay   = document.getElementById("overlay");
+const STORAGE_KEY = "tutor-history";
+let started = false;
+
+function ensureStarted() {
+  if(started) return; 
+  started = true;
+  welcome.style.display = "none";
+  chatOuter.style.display = "block";
+  overlay.style.background = "var(--bg-overlay-chat)";
+  const btn = document.getElementById("clear-btn");
+  if(btn) {
+    btn.style.display = "flex";
+    requestAnimationFrame(()=>{ 
+      btn.style.opacity = "1"; 
+    });
+  }
+  lucide.createIcons();
+}
+
+function formatText(t) {
+  // ── 1. Code block dulu sebelum apapun (agar isinya tidak ikut diproses) ──
+  const codeBlocks = [];
+  t = t.replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) => {
+    codeBlocks.push(code);
+    return `%%CODE_${codeBlocks.length - 1}%%`;
+  });
+
+  // ── 2. Inline code ──
+  const inlineCodes = [];
+  t = t.replace(/`([^`]+)`/g, (_, code) => {
+    inlineCodes.push(code);
+    return `%%INLINE_${inlineCodes.length - 1}%%`;
+  });
+
+// ── 3. Heading ──
+t = t.replace(/^####\s+(.+)$/gm, "<div style='font-size:0.88rem;font-weight:700;color:var(--gold);margin:8px 0 3px;'>$1</div>");
+t = t.replace(/^###\s+(.+)$/gm,  "<div style='font-size:0.95rem;font-weight:700;color:var(--gold);margin:10px 0 4px;'>$1</div>");
+t = t.replace(/^##\s+(.+)$/gm,   "<div style='font-size:1rem;font-weight:700;color:var(--gold-lt);margin:12px 0 4px;'>$1</div>");
+t = t.replace(/^#\s+(.+)$/gm,    "<div style='font-size:1.1rem;font-weight:700;color:var(--gold-lt);margin:14px 0 6px;'>$1</div>");
+
+  // ── 4. Bold & italic (SEBELUM bullet agar * bullet tidak dianggap italic) ──
+  t = t.replace(/\*\*\*(.*?)\*\*\*/g, "<b><em>$1</em></b>");
+  t = t.replace(/\*\*(.*?)\*\*/g,     "<b>$1</b>");
+  t = t.replace(/__(.*?)__/g,         "<b>$1</b>");
+  // italic: hanya * atau _ yang DIAPIT konten (bukan di awal baris)
+  t = t.replace(/(?<!^)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/gm, "<em>$1</em>");
+  t = t.replace(/(?<!^)_(?!\s)(.+?)(?<!\s)_(?!_)/gm,   "<em>$1</em>");
+
+  // ── 5. Blockquote ──
+  t = t.replace(/^>\s*(.+)$/gm, "<blockquote style='border-left:3px solid var(--gold);padding:6px 12px;margin:6px 0;background:rgba(124,106,255,0.06);border-radius:0 8px 8px 0;font-style:italic;color:var(--chip-txt);font-size:0.87rem;'>$1</blockquote>");
+
+  // ── 6. HR ──
+  t = t.replace(/^(-{3,}|={3,})$/gm, "<hr style='border:none;border-top:1px solid rgba(124,106,255,0.2);margin:4px 0;'/>");
+
+  // ── 7. Numbered list ──
+let olCounter = 0;
+t = t.replace(/^(\d+)\.\s+(.+)$/gm, (_, num, content) => {
+  olCounter = parseInt(num);
+  return `<li data-num='${olCounter}'>${content}</li>`;
+});
+// ── 7b. Alphabetical list (a. b. c.) ──
+t = t.replace(/^[a-z]\.\s+(.+)$/gm, "<li class='alpha-li'>$1</li>");
+
+t = t.replace(/(<li class='alpha-li'>[\s\S]*?<\/li>)+/g, m =>
+  "<ol style='margin:6px 0 6px 18px;display:flex;flex-direction:column;gap:3px;list-style:lower-alpha;padding-left:12px;'>" +
+  m.replace(/class='alpha-li'/g, "") + "</ol>"
+);
+
+// Bungkus dalam <ol> dengan start yang benar
+t = t.replace(/(<li data-num='\d+'?>[\s\S]*?<\/li>)+/g, m => {
+  const firstNum = m.match(/data-num='(\d+)'/)?.[1] || "1";
+  return `<ol start='${firstNum}' style='margin:6px 0 6px 18px;display:flex;flex-direction:column;gap:3px;list-style:decimal;padding-left:4px;'>` +
+    m.replace(/ data-num='\d+'/g, "") + "</ol>";
+});
+
+// ── 8. Sub-bullet (indented) ──
+t = t.replace(/^[ \t]+[\*\-•✓✔➤▸▶→]\s+(.+)$/gm,
+  "<li class='sub-li'>$1</li>"
+);
+
+// ── 9. Bullet utama ──
+t = t.replace(/^[\-•✓✔➤▸▶→]\s+(.+)$/gm, "<li class='main-li'>$1</li>");
+t = t.replace(/^\*\s+(.+)$/gm,            "<li class='main-li'>$1</li>");
+
+// Bungkus sub-li dulu (sebelum main-li agar tidak tercampur)
+t = t.replace(/(<li class='sub-li'>[\s\S]*?<\/li>)+/g, m =>
+  "<ul style='margin:4px 0 4px 32px;display:flex;flex-direction:column;gap:3px;list-style:circle;padding-left:4px;'>" +
+  m.replace(/class='sub-li'/g, "") + "</ul>"
+);
+
+// Bungkus main-li
+t = t.replace(/(<li class='main-li'>[\s\S]*?<\/li>)+/g, m =>
+  "<ul style='margin:6px 0 6px 16px;display:flex;flex-direction:column;gap:3px;list-style:disc;padding-left:4px;'>" +
+  m.replace(/class='main-li'/g, "") + "</ul>"
+);
+
+  // ── 10. Emoji section header ──
+  t = t.replace(/^([📌🎯🔬⚙️🔄📊🔭💡✅📖📝🔗📚]\s*.+)$/gm,
+    "<div style='font-weight:600;color:var(--gold-lt);margin:10px 0 3px;font-size:0.9rem;'>$1</div>"
+  );
+
+  // ── 11. Newline → <br> ──
+  t = t.replace(/\n/g, "<br>");
+
+  // ── 12. Bersihkan <br> di sekitar elemen block ──
+  t = t.replace(/<br>\s*(<\/?(?:ul|ol|li|pre|blockquote|div|hr)[^>]*>)/gi, "$1");
+  t = t.replace(/(<\/?(?:ul|ol|li|pre|blockquote|div|hr)[^>]*>)\s*<br>/gi, "$1");
+  t = t.replace(/(<br>\s*){3,}/g, "<br><br>");
+
+  // ── 13. Kembalikan code block & inline code ──
+  t = t.replace(/%%CODE_(\d+)%%/g, (_, i) =>
+    `<pre style='background:rgba(0,0,0,0.35);border:1px solid rgba(124,106,255,0.2);border-radius:10px;padding:12px 14px;overflow-x:auto;font-size:0.8rem;line-height:1.6;font-family:monospace;color:#c8ffc8;margin:8px 0;white-space:pre;'>${codeBlocks[i]}</pre>`
+  );
+  t = t.replace(/%%INLINE_(\d+)%%/g, (_, i) =>
+    `<code style='background:rgba(124,106,255,0.15);border:1px solid rgba(124,106,255,0.25);border-radius:4px;padding:1px 6px;font-size:0.82em;font-family:monospace;color:var(--gold-lt);'>${inlineCodes[i]}</code>`
+  );
+
+  return t;
+}
+
+const COPY_SVG  = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+function makeCopyBtn(bubble) {
+  const btn = document.createElement("button");
+  btn.className = "copy-btn";
+  btn.innerHTML = COPY_SVG + " Copy";
+  btn.onclick = () => navigator.clipboard.writeText(bubble.innerText).then(()=>{
+    btn.innerHTML = CHECK_SVG + " Copied";
+    setTimeout(()=>{ btn.innerHTML = COPY_SVG + " Copy"; }, 5000);
+  });
+  return btn;
+}
+
+function appendUserBubble(html, save=true) {
+  const wrap = document.createElement("div");
+  wrap.dataset.role = "user"; wrap.className = "bubble-user-wrap fade-up";
+  const b = document.createElement("div"); b.className="bubble-user"; b.innerHTML=html;
+  wrap.appendChild(b);
+  wrap.appendChild(makeCopyBtn(b));
+  chat.appendChild(wrap); scrollBottom();
+  if(save) saveHistory();
+}
+
+function sanitizeLatex(el) {
+  // Ganti $teks biasa$ yang bukan math → hapus tanda $-nya saja
+  el.innerHTML = el.innerHTML.replace(
+    /\$([^$\n]{1,80}?)\$/g,
+    (match, inner) => {
+      // Kalau ada karakter math → biarkan KaTeX handle
+      if (/[\\^_{}]|\\frac|\\sum|\\int/.test(inner)) return match;
+      // Kalau isinya plain text seperti CO2, O2 → buang $ nya
+      return inner;
+    }
+  );
+}
+
+function appendAIBubble(html, lv, save=true) {
+  const wrap = document.createElement("div");
+  wrap.dataset.role="ai"; wrap.dataset.level=lv; wrap.className="bubble-ai-wrap fade-up";
+  const badge = document.createElement("div"); badge.className="level-badge";
+  badge.textContent = LEVEL_LABELS[lv]||lv; wrap.appendChild(badge);
+  const b = document.createElement("div"); b.className="bubble-ai"; b.innerHTML=html;
+  wrap.appendChild(b); wrap.appendChild(makeCopyBtn(b));
+  chat.appendChild(wrap); scrollBottom();
+  if(save) saveHistory();
+  sanitizeLatex(wrap);
+  renderMathInElement(wrap, {
+  delimiters: [
+    {left: "$$", right: "$$", display: true},
+    {left: "$",  right: "$",  display: false}
+  ],
+  throwOnError: false,   // ← tidak crash kalau LaTeX invalid
+  errorColor: "inherit", // ← warna error sama dengan teks biasa
+  ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+});
+}
+
+function scrollBottom() { chatOuter.scrollTo({top:chatOuter.scrollHeight,behavior:"smooth"}); }
+
+function saveHistory() {
+  const msgs = [...document.querySelectorAll("#chat>[data-role]")].map(el=>({
+    role:el.dataset.role, html:el.querySelector(".bubble-user,.bubble-ai")?.innerHTML||"", level:el.dataset.level||null
+  }));
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(msgs)); } catch(e){}
+}
+
+function loadHistory() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const msgs = JSON.parse(raw);
+    if(!msgs.length) return false;
+    msgs.forEach(m => m.role==="user" ? appendUserBubble(m.html,false) : appendAIBubble(m.html,m.level||"intermediate",false));
+    return true;
+  } catch(e){ return false; }
+}
+
+async function sendDirect(text) {
+  ensureStarted();
+  appendUserBubble(formatText(text));
+  const lv = currentLevel;
+  const tw = document.createElement("div");
+  tw.className="bubble-ai-wrap fade-up";
+  tw.innerHTML=`<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  chat.appendChild(tw); scrollBottom();
+  try {
+    const res = await fetch("/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:text,level:lv,stream:true})});
+    tw.remove();
+    if((res.headers.get("content-type")||"").includes("text/event-stream")) {
+      const wrap=document.createElement("div"); wrap.dataset.role="ai"; wrap.dataset.level=lv; wrap.className="bubble-ai-wrap fade-up";
+      const badge=document.createElement("div"); badge.className="level-badge"; badge.textContent=LEVEL_LABELS[lv]||lv; wrap.appendChild(badge);
+      const b=document.createElement("div"); b.className="bubble-ai stream-cursor"; wrap.appendChild(b); chat.appendChild(wrap);
+      const reader=res.body.getReader(); const dec=new TextDecoder(); let full="";
+      while(true){
+        const {value,done}=await reader.read(); if(done)break;
+        for(const line of dec.decode(value).split("\n")){
+          if(line.startsWith("data: ")){const d=line.slice(6).trim(); if(d==="[DONE]")break; try{full+=JSON.parse(d).text||""; b.innerHTML=formatText(full); scrollBottom();}catch(e){}}
+        }
+      }
+      b.classList.remove("stream-cursor"); wrap.appendChild(makeCopyBtn(b)); saveHistory();
+      renderMathInElement(wrap, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$",  right: "$",  display: false}
+        ]
+      });
+      saveHistory();
+    } else {
+      const data=await res.json(); appendAIBubble(formatText(data.answer||"Tidak ada respon"),lv);
+    }
+  } catch(e){ tw.remove(); appendAIBubble("Terjadi kesalahan pada server.",lv); }
+}
+
+async function tanya() {
+  const inp=document.getElementById("question"); const q=inp.value.trim(); if(!q)return;
+  inp.value=""; await sendDirect(q);
+}
+
+function clearChat() {
+  if(!started) return;
+  showModal("Start a new chat?", "All chat history will be deleted.", () => {
+    chat.innerHTML = ""; 
+    sessionStorage.removeItem(STORAGE_KEY); 
+    started = false;
+    chatOuter.style.display = "none"; 
+    welcome.style.display = ""; 
+    overlay.style.background = "var(--bg-overlay)";
+    const btn = document.getElementById("clear-btn"); 
+    if(btn) {
+      btn.style.opacity = "0";
+      setTimeout(() => { btn.style.display = "none"; }, 300);
+    }
+    renderChips();
+  });
+}
+
+function showModal(title, sub, onOk) {
+  const bd = document.createElement("div");
+  bd.style.cssText = "position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;";
+  
+  const box = document.createElement("div");
+  box.style.cssText = "background:var(--input-bg);border:1px solid var(--card-bdr);border-radius:18px;padding:24px 28px;max-width:300px;width:90%;text-align:center;font-family:'DM Sans',sans-serif;backdrop-filter:blur(16px);box-shadow:0 8px 40px rgba(0,0,0,0.4);";
+  
+  box.innerHTML = `
+    <div style="display:flex;justify-content:center;margin-bottom:10px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </div>
+    <div style="font-family:'Playfair Display';font-size:1rem;font-weight:600;color:var(--header-txt);margin-bottom:6px;">${title}</div>
+    <div style="font-size:0.8rem;opacity:0.7;color:var(--bubble-ai-txt);margin-bottom:20px;">${sub}</div>
+    <div style="display:flex;gap:10px;">
+      <button class="modal-cancel">Cancel</button>
+      <button class="modal-delete">Delete</button>
+    </div>
+  `;
+  
+  bd.appendChild(box);
+  document.body.appendChild(bd);
+  
+  box.querySelector(".modal-cancel").onclick = () => bd.remove();
+  box.querySelector(".modal-delete").onclick = () => { bd.remove(); onOk(); };
+  bd.onclick = (e) => { if (e.target === bd) bd.remove(); };
+}
+
+// ════ CHIPS ════
+const topics = [
+  // Science & Nature
+  "Photosynthesis", "DNA & Genetics", "Black Holes", "Quantum Mechanics",
+  "Thermodynamics", "Newton's Laws", "Evolution", "The Human Brain",
+  "Volcanoes", "Ocean Currents", "The Atmosphere", "Ecosystems",
+  "Animal Migration", "Bioluminescence", "Plate Tectonics", "The Water Cycle",
+  "Coral Reefs", "The Northern Lights", "Gravity", "Relativity",
+
+  // Technology
+  "Machine Learning", "Neural Networks", "The Internet", "Blockchain",
+  "Cloud Computing", "Cybersecurity", "Python Programming", "Algorithms",
+  "Artificial Intelligence", "Quantum Computing", "Semiconductors", "GPS Technology",
+
+  // History & Society
+  "The Industrial Revolution", "World War II", "The Cold War", "The Renaissance",
+  "The Roman Empire", "The Silk Road", "The French Revolution", "Ancient Egypt",
+  "The Space Race", "The Printing Press", "Colonialism", "The Age of Exploration",
+
+  // Math & Logic
+  "Calculus", "Linear Algebra", "Probability & Statistics", "Game Theory",
+  "Prime Numbers", "The Fibonacci Sequence", "Cryptography", "Chaos Theory",
+
+  // Human Body & Health
+  "The Immune System", "How Memory Works", "Sleep Science", "The Gut Microbiome",
+  "How Vaccines Work", "The Nervous System", "Adrenaline", "How the Heart Works",
+
+  // Psychology & Behavior
+  "Cognitive Biases", "The Placebo Effect", "Why We Dream", "Social Psychology",
+  "Habit Formation", "Decision Making", "Emotional Intelligence", "Motivation Science",
+
+  // Economics & Finance
+  "Supply and Demand", "Inflation", "How the Stock Market Works",
+  "Game Theory in Economics", "Cryptocurrency", "Global Trade",
+
+  // Philosophy & Ideas
+  "The Scientific Method", "Logical Fallacies", "Ethics & Morality",
+  "Stoicism", "Critical Thinking", "The Philosophy of Time",
+
+  // Fun & Curious Facts
+  "Why the Sky is Blue", "How Airplanes Fly", "Why We Yawn",
+  "How Rainbows Form", "Why Cats Purr", "How Soap Works",
+  "Why Do We Laugh", "How Birds Navigate", "Why Ice is Slippery",
+  "How Music Affects the Brain", "Why Leaves Change Color", "How Honey Never Spoils"
+];
+
+const templates = [
+  "What is {topic}?",
+  "How does {topic} work?",
+  "Explain the concept of {topic}",
+  "What are the key principles of {topic}?",
+  "Why is {topic} important?",
+  "What are real-world applications of {topic}?",
+  "What are the most fascinating facts about {topic}?",
+  "Can you give a simple explanation of {topic}?",
+  "What do most people misunderstand about {topic}?",
+  "What makes {topic} so interesting?"
+];
+
+const ALL_PROMPTS = [];
+
+topics.forEach(topic => {
+
+  templates.forEach(template => {
+
+    const text =
+      template.replace("{topic}", topic);
+
+    ALL_PROMPTS.push({
+      label: text,
+      text: text
+    });
+
+  });
+
+});
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function renderChips(){
+  const c=document.getElementById("chips"); c.innerHTML="";
+  shuffle(ALL_PROMPTS).slice(0,4).forEach(p=>{
+    const b=document.createElement("button"); b.className="chip fade-up"; b.textContent=p.label;
+    b.onclick=()=>sendDirect(p.text); c.appendChild(b);
+  });
+}
+renderChips();
+
+function clearChat() {
+  if(!started) return;
+  showModal("Start a new chat?", "All chat history will be deleted.", async () => {
+    
+    // ← TAMBAHKAN INI — reset sesi di server
+    try {
+      await fetch("/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level: currentLevel })
+      });
+    } catch(e) { console.warn("Reset session failed:", e); }
+
+    chat.innerHTML = ""; 
+    sessionStorage.removeItem(STORAGE_KEY); 
+    started = false;
+    chatOuter.style.display = "none"; 
+    welcome.style.display = ""; 
+    overlay.style.background = "var(--bg-overlay)";
+    const btn = document.getElementById("clear-btn"); 
+    if(btn) {
+      btn.style.opacity = "0";
+      setTimeout(() => { btn.style.display = "none"; }, 300);
+    }
+    renderChips();
+  });
+}
+
+if(loadHistory()) ensureStarted();
+document.getElementById("question").addEventListener("keypress",e=>{if(e.key==="Enter")tanya();});
+
+document.querySelectorAll(".nav-item").forEach(item => {
+  const tooltip = item.querySelector(".nav-tooltip");
+  if (!tooltip) return;
+  item.addEventListener("mouseenter", () => {
+    if (sidebarOpen) return;
+    const rect = item.getBoundingClientRect();
+    tooltip.style.top  = (rect.top + rect.height / 2) + "px";
+    tooltip.style.left = (rect.right + 12) + "px";
+    tooltip.style.transform = "translateY(-50%)";
+  });
+});
+lucide.createIcons();
+</script>
+</body>
+</html>

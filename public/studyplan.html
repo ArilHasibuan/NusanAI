@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="images/logo.png">
+  <title>NusanAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    [data-theme="dark"] {
+      --bg-overlay:  rgba(8,8,16,0.65);
+      --accent:      #7c6aff; --accent-lt:#a99fff; --accent-dk:#4a3acc;
+      --gold-a:      #6c5ce7; --gold-b:#4a3acc;
+      --txt-main:    #f0eeff; --txt-sub:#c8c0f0;
+      --card-bg:     rgba(124,106,255,0.06); --card-bdr:rgba(124,106,255,0.18);
+      --chip-bdr:    rgba(124,106,255,0.22); --chip-txt:#a99fff;
+      --header-txt:  #c4b9ff;
+      --icon-btn-bg: rgba(124,106,255,0.09); --icon-btn-hover:rgba(124,106,255,0.18);
+      --scrollbar:   rgba(124,106,255,0.28);
+      --input-bg:    rgba(20,18,40,0.6); --input-bdr:rgba(124,106,255,0.22);
+      --input-txt:   #f0eeff; --input-ph:rgba(124,106,255,0.38);
+      --sidebar-bg: rgba(8,8,20,0.92);
+      --sidebar-border: rgba(124,106,255,0.18);
+      --tooltip-bg: rgba(30,28,58,0.97);
+    }
+    [data-theme="light"] {
+      --bg-overlay:  rgba(235,230,255,0.65);
+      --accent:      #5b4fcf; --accent-lt:#3d2fa0; --accent-dk:#7c6aff;
+      --gold-a:      #6c5ce7; --gold-b:#4a3acc;
+      --txt-main:    #1a1640; --txt-sub:#2e2860;
+      --card-bg:     rgba(255,255,255,0.62); --card-bdr:rgba(91,79,207,0.2);
+      --chip-bdr:    rgba(91,79,207,0.28); --chip-txt:#4a3acc;
+      --header-txt:  #4a3acc;
+      --icon-btn-bg: rgba(91,79,207,0.09); --icon-btn-hover:rgba(91,79,207,0.18);
+      --scrollbar:   rgba(91,79,207,0.28);
+      --input-bg:    rgba(255,255,255,0.65); --input-bdr:rgba(91,79,207,0.28);
+      --input-txt:   #1a1640; --input-ph:rgba(91,79,207,0.4);
+      --sidebar-bg: rgba(240,238,255,0.96);
+      --sidebar-border: rgba(91,79,207,0.18);
+      --tooltip-bg: rgba(255,255,255,0.97);
+    }
+    html, body { height:100%; margin:0; overflow:hidden; font-family: 'Inter', sans-serif; }
+    #welcome h1 { font-family: 'Space Grotesk', sans-serif; }
+    #main-scroll{scrollbar-width:thin;scrollbar-color:var(--scrollbar) transparent;}
+    #main-scroll::-webkit-scrollbar{width:4px;}
+    #main-scroll::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:99px;}
+    /* GLOBAL SCROLLBAR */
+*{
+  scrollbar-width:thin;
+  scrollbar-color:var(--scrollbar) transparent;
+}
+
+*::-webkit-scrollbar{
+  width:6px;
+  height:6px;
+}
+
+*::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+*::-webkit-scrollbar-thumb{
+  background:var(--scrollbar);
+  border-radius:99px;
+}
+
+*::-webkit-scrollbar-thumb:hover{
+  background:var(--accent);
+}
+
+    /* ========== SIDEBAR STYLES ========== */
+    #sidebar {
+      position: fixed; left:0; top:0; bottom:0;
+      width: 56px; background: var(--sidebar-bg);
+      backdrop-filter: blur(20px); border-right: 1px solid var(--sidebar-border);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0; gap: 4px; z-index: 100;
+      transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
+      overflow: visible;
+    }
+    #sidebar.expanded { width: 220px; }
+    #sidebar-toggle { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--chip-bdr); background: var(--icon-btn-bg); color: var(--chip-txt); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 8px; }
+    #sidebar-toggle:hover { background:var(--icon-btn-hover); border-color:var(--accent); }
+    .sidebar-divider { width: 32px; height: 1px; background: var(--sidebar-border); margin: 4px 0; }
+    #sidebar.expanded .sidebar-divider { width: 180px; }
+    .nav-item { position: relative; overflow: visible; width: 36px; height: 36px; border-radius: 10px; border: 1px solid transparent; background: transparent; color: var(--chip-txt); display: flex; align-items: center; cursor: pointer; transition: all 0.2s; text-decoration: none; flex-shrink: 0; white-space: nowrap; padding: 0 10px; gap: 12px; }
+    .nav-item:hover { background: var(--icon-btn-hover); border-color: var(--accent); color: var(--accent); }
+    .nav-item.active { background: var(--icon-btn-hover); border-color: var(--accent); color: var(--accent); }
+    #sidebar.expanded .nav-item { width: 192px; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; }
+    .nav-label { font-size: 0.82rem; font-weight: 500; opacity: 0; transition: opacity 0.18s; font-family: 'Inter', sans-serif;}
+    #sidebar.expanded .nav-label { opacity: 1; }
+    .nav-tooltip { position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%); background: var(--tooltip-bg); border: 1px solid var(--chip-bdr); color: var(--chip-txt); font-size: 0.75rem; padding: 6px 12px; border-radius: 8px; white-space: nowrap; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-weight: 500; }
+    #sidebar:not(.expanded) .nav-item:hover .nav-tooltip { opacity: 1; visibility: visible; }
+    #sidebar.expanded .nav-tooltip { display: none; }
+    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding: 0 10px; }
+    #mainContainer { margin-left: 56px; transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1); height: 100vh; display: flex; flex-direction: column; }
+    body.sidebar-open #mainContainer { margin-left: 220px; }
+
+    /* FORM */
+    .form-wrap{max-width:560px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding:20px 20px 0;}
+    .form-label{font-size:0.75rem;color:var(--chip-txt);opacity:0.65;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+    .form-input,.form-select,.form-textarea{
+      width:100%;background:var(--input-bg);border:1px solid var(--input-bdr);
+      border-radius:11px;padding:11px 14px;
+      color:var(--input-txt);font-family:'DM Sans',sans-serif;font-size:0.88rem;
+      outline:none;transition:border-color 0.2s;box-sizing:border-box;
+    }
+    .form-input::placeholder,.form-textarea::placeholder{color:var(--input-ph);}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);}
+    .form-textarea{resize:vertical;min-height:80px;line-height:1.5;}
+    .form-select option{background:#1a1640;}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    #gen-btn{
+      padding:12px;border-radius:12px;border:none;
+      background:linear-gradient(135deg,var(--gold-a),var(--gold-b));
+      color:#f0eeff;font-family:'Playfair Display',serif;font-size:0.95rem;
+      letter-spacing:0.04em;cursor:pointer;transition:opacity 0.2s,transform 0.15s;
+      box-shadow:0 4px 20px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    #gen-btn:hover{opacity:0.88;transform:translateY(-1px);}
+    #gen-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+    #gen-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+    /* RESULT */
+    #result-wrap{display:none;flex:1;overflow:hidden;min-height:0;flex-direction:column;}
+    #result-main-scroll{flex:1;overflow-y:auto;min-height:0;padding:16px 20px 24px;}
+    #plan-content{max-width:640px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:12px;}
+
+    .plan-header{background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:16px;padding:18px 20px;backdrop-filter:blur(8px);}
+    .plan-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--txt-main);margin-bottom:4px;}
+    .plan-meta{font-size:0.78rem;color:var(--chip-txt);opacity:0.7;display:flex;gap:12px;flex-wrap:wrap;}
+    .plan-meta span{display:flex;align-items:center;gap:4px;}
+    .plan-meta svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;}
+
+    .week-card{background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:14px;overflow:hidden;backdrop-filter:blur(6px);}
+    .week-header{padding:12px 16px;background:rgba(124,106,255,0.08);border-bottom:1px solid var(--card-bdr);display:flex;align-items:center;gap:10px;cursor:pointer;transition:background 0.18s;}
+    .week-header:hover{background:rgba(124,106,255,0.14);}
+    .week-num{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--gold-a),var(--gold-b));display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;color:#f0eeff;flex-shrink:0;}
+    .week-title{font-size:0.88rem;font-weight:500;color:var(--txt-main);flex:1;}
+    .week-toggle{width:18px;height:18px;stroke:var(--chip-txt);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.25s;}
+    .week-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+
+    .week-section-label{font-size:0.7rem;font-weight:500;color:var(--accent-lt);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
+    .tag-list{display:flex;flex-wrap:wrap;gap:6px;}
+    .tag{padding:4px 10px;border-radius:20px;border:1px solid var(--chip-bdr);font-size:0.75rem;color:var(--chip-txt);background:rgba(124,106,255,0.06);}
+    .activity-item{font-size:0.82rem;color:var(--txt-sub);line-height:1.5;display:flex;gap:6px;align-items:flex-start;}
+    .activity-item::before{content:"→";color:var(--accent-lt);flex-shrink:0;}
+    .week-hours{font-size:0.75rem;color:var(--chip-txt);opacity:0.6;display:flex;align-items:center;gap:4px;}
+    .resource-section{background:rgba(124,106,255,0.05);border:1px solid var(--card-bdr);border-radius:12px;padding:14px 16px;}
+    .resource-title{font-size:0.78rem;font-weight:500;color:var(--accent-lt);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+    .resource-title svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+    .resource-item{font-size:0.82rem;color:var(--txt-sub);padding:4px 0;border-bottom:1px solid rgba(124,106,255,0.08);display:flex;gap:6px;align-items:flex-start;line-height:1.5;}
+    .resource-item:last-child{border-bottom:none;}
+    .resource-item::before{content:"·";color:var(--accent-lt);flex-shrink:0;margin-top:1px;}
+
+    .action-bar{display:flex;gap:8px;align-items:center;padding:12px 20px;max-width:640px;margin:0 auto;width:100%;box-sizing:border-box;}
+
+    #loading{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;}
+    .loading-dots{display:flex;gap:8px;}
+    .loading-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);opacity:0.4;animation:bounce 1.2s infinite ease-in-out;}
+    .loading-dot:nth-child(1){animation-delay:0s}.loading-dot:nth-child(2){animation-delay:0.2s}.loading-dot:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-10px);opacity:1}}
+    #loading p{color:var(--chip-txt);font-size:0.88rem;opacity:0.72;font-style:italic;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp 0.35s ease forwards;}
+
+    .copy-plan-btn{
+      background:var(--card-bg);border:1px solid var(--chip-bdr);border-radius:9px;
+      padding:8px 14px;color:var(--chip-txt);font-family:'DM Sans',sans-serif;font-size:0.82rem;
+      cursor:pointer;display:flex;align-items:center;gap:6px;transition:background 0.2s,border-color 0.2s;
+    }
+    .copy-plan-btn:hover{background:var(--icon-btn-hover);border-color:var(--accent);}
+    .copy-plan-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;}
+    .icon-btn{
+  background:var(--card-bg);
+  border:1px solid var(--chip-bdr);
+  border-radius:9px;
+
+  padding:8px 14px;
+
+  color:var(--chip-txt);
+
+  font-family:'DM Sans',sans-serif;
+  font-size:0.82rem;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  transition:background 0.2s,border-color 0.2s;
+}
+
+.icon-btn:hover{
+  background:var(--icon-btn-hover);
+  border-color:var(--accent);
+}
+
+.icon-btn svg{
+  width:13px;
+  height:13px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+}
+  </style>
+</head>
+<body class="relative" style="height:100vh;">
+
+<div class="absolute inset-0">
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a1a,#12102a,#0d0a1f);"></div>
+</div>
+<div class="absolute inset-0" style="background:var(--bg-overlay);transition:background 0.5s;"></div>
+
+<svg style="display:none">
+  <symbol id="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="ic-sparkle" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
+  <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="ic-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+</svg>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <button id="sidebar-toggle" onclick="toggleSidebar()" title="Open / Close Sidebar">
+    <i data-lucide="panel-left" style="width:16px;height:16px;"></i>
+  </button>
+  <div class="sidebar-divider"></div>
+  <a href="index.html" class="nav-item"><i data-lucide="message-circle"></i><span class="nav-label">Chat</span><span class="nav-tooltip">Chat</span></a>
+  <a href="quiz.html" class="nav-item"><i data-lucide="brain"></i><span class="nav-label">Quiz</span><span class="nav-tooltip">Quiz</span></a>
+  <a href="studyplan.html" class="nav-item active"><i data-lucide="calendar"></i><span class="nav-label">Study Plan</span><span class="nav-tooltip">Study Plan</span></a>
+  <a href="evaluator.html" class="nav-item"><i data-lucide="clipboard-check"></i><span class="nav-label">Evaluator</span><span class="nav-tooltip">Evaluator</span></a>
+  <a href="compare.html" class="nav-item"><i data-lucide="git-compare"></i><span class="nav-label">Compare Prompt</span><span class="nav-tooltip">Compare Prompt</span></a>
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider"></div>
+    <button class="nav-item" onclick="toggleTheme()" style="border:none;"><span id="theme-icon" style="display:inline-flex;align-items:center;"><i data-lucide="sun" style="width:16px;height:16px;"></i></span><span class="nav-label">Change Theme</span><span class="nav-tooltip">Change Theme</span></button>
+  </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="relative flex flex-col" id="mainContainer">
+  
+  <!-- FORM AREA -->
+  <div id="form-area" style="flex:1;overflow-y:auto;padding-bottom:24px;">
+    <div class="form-wrap">
+      <div style="text-align:center;padding:16px 0 8px;">
+        <div style="width:50px;height:50px;border-radius:13px;background:var(--icon-btn-bg);border:1px solid var(--chip-bdr);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:var(--accent-lt);fill:none;stroke-width:1.6;"><use href="#ic-book"/></svg>
+        </div>
+        <div style="font-family: 'Space Grotesk', sans-serif;font-size:1.45rem;color:var(--txt-main);line-height:1.4;">Study Plan Generator</div>
+        <div style="font-size:0.84rem;color:var(--chip-txt);opacity:0.65;margin-top:6px;">Create a structured study plan based on your topic and learning goals</div>
+      </div>
+
+      <div>
+        <div class="form-label">Topic</div>
+        <input class="form-input" id="f-topic" placeholder="Cell Biology, Machine Learning, Chemical Reactions..."/>
+      </div>
+      <div>
+  <div class="form-label">Learning Goal</div>
+  <textarea 
+    class="form-textarea" 
+    id="f-goal" 
+    placeholder="Build a simple ML model, prepare for exams, understand fundamental concepts..."
+  ></textarea>
+</div>
+
+<div class="row2">
+  <div>
+    <div class="form-label">Level</div>
+    <select class="form-select" id="f-level">
+      <option value="beginner">Beginner</option>
+      <option value="intermediate" selected>Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="form-label">Study Duration</div>
+    <select class="form-select" id="f-duration">
+      <option value="1week">1 Week (Daily)</option>
+      <option value="1month" selected>1 Month (Weekly)</option>
+      <option value="3months">3 Months (Monthly)</option>
+      <option value="6months">6 Months (Monthly)</option>
+      <option value="1year">1 Year (Monthly)</option>
+    </select>
+  </div>
+</div>
+
+      <button id="gen-btn" onclick="generatePlan()">
+        <svg viewBox="0 0 24 24"><use href="#ic-sparkle"/></svg>
+        Create Study Plan
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" style="display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+    <div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>
+    <p>Create your study plan…</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-wrap" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+    <div class="action-bar flex-shrink-0">
+      <button class="icon-btn" onclick="resetForm()">
+        <svg viewBox="0 0 24 24"><use href="#ic-refresh"/></svg>Create New
+      </button>
+      <button class="copy-plan-btn" onclick="copyPlan()">
+        <svg viewBox="0 0 24 24"><use href="#ic-copy"/></svg>Copy All
+      </button>
+    </div>
+    <div id="result-main-scroll" style="flex:1;overflow-y:auto;">
+      <div id="plan-content"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ========== SIDEBAR ==========
+let sidebarOpen = localStorage.getItem("sidebar-open") === "true";
+function applySidebar() {
+  const sb = document.getElementById("sidebar");
+  if (sidebarOpen) { sb.classList.add("expanded"); document.body.classList.add("sidebar-open"); }
+  else { sb.classList.remove("expanded"); document.body.classList.remove("sidebar-open"); }
+}
+function toggleSidebar() { sidebarOpen = !sidebarOpen; localStorage.setItem("sidebar-open", sidebarOpen); applySidebar(); }
+applySidebar();
+
+// ========== THEME ==========
+let currentTheme = localStorage.getItem("learnai-theme") || "dark";
+document.documentElement.setAttribute("data-theme", currentTheme);
+
+function toggleTheme() {
+  const themeIconSpan = document.getElementById("theme-icon");
+  if (themeIconSpan) {
+    themeIconSpan.style.transform = "rotate(180deg) scale(0)"; themeIconSpan.style.opacity = "0";
+    setTimeout(() => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", currentTheme);
+      localStorage.setItem("learnai-theme", currentTheme);
+      const newIcon = currentTheme === "dark" ? "sun" : "moon";
+      themeIconSpan.innerHTML = `<i data-lucide="${newIcon}" style="width:16px;height:16px;"></i>`;
+      themeIconSpan.style.transition = "none"; themeIconSpan.style.transform = "rotate(-180deg) scale(0)"; themeIconSpan.style.opacity = "0";
+      lucide.createIcons();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        themeIconSpan.style.transition = "transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.3s";
+        themeIconSpan.style.transform = "rotate(0deg) scale(1)"; themeIconSpan.style.opacity = "1";
+      }));
+    }, 200);
+  } else {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    localStorage.setItem("learnai-theme", currentTheme);
+    lucide.createIcons();
+  }
+}
+
+// ========== STUDY PLAN LOGIC ==========
+function show(id) {
+  const formArea = document.getElementById("form-area");
+  const loading = document.getElementById("loading");
+  const resultWrap = document.getElementById("result-wrap");
+  if (formArea) formArea.style.display = "none";
+  if (loading) loading.style.display = "none";
+  if (resultWrap) resultWrap.style.display = "none";
+  if (id === "form-area") formArea.style.display = "block";
+  else if (id === "loading") loading.style.display = "flex";
+  else if (id === "result-wrap") resultWrap.style.display = "flex";
+}
+
+async function generatePlan() {
+  const topic    = document.getElementById("f-topic").value.trim();
+  const goal     = document.getElementById("f-goal").value.trim();
+  const level    = document.getElementById("f-level").value;
+  const duration = document.getElementById("f-duration").value;
+  if (!topic) { document.getElementById("f-topic").focus(); return; }
+  document.getElementById("gen-btn").disabled = true;
+  show("loading");
+  try {
+    const res = await fetch("/studyplan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, goal, level, duration })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    renderPlan(data.plan);
+    localStorage.setItem(
+  "studyplan-last-result",
+  JSON.stringify(data.plan)
+);
+    show("result-wrap");
+  } catch(e) {
+    show("form-area");
+    alert("Gagal membuat study plan. Coba lagi.\n" + e.message);
+  } finally {
+    document.getElementById("gen-btn").disabled = false;
+  }
+}
+
+function renderPlan(plan) {
+  const c = document.getElementById("plan-content");
+  c.innerHTML = "";
+  const header = document.createElement("div");
+  header.className = "plan-header fade-up";
+  const unitLabel = plan.duration_label || (plan.weeks?.length + " " + (plan.unit || "minggu"));
+  header.innerHTML = `<div class="plan-title">${plan.title}</div>
+  <div style="
+  font-size:0.82rem;
+  color:var(--txt-sub);
+  line-height:1.6;
+  margin:6px 0 10px;
+">
+  ${plan.overview}
+</div>
+  <div class="plan-meta">
+    <span><svg viewBox="0 0 24 24"><use href="#ic-calendar"/></svg>${unitLabel}</span>
+    <span><svg viewBox="0 0 24 24"><use href="#ic-book"/></svg>${plan.weeks?.length || 0} ${plan.unit || "minggu"}</span>
+  </div>`;
+  
+  c.appendChild(header);
+  plan.weeks?.forEach((week, wi) => {
+    const card = document.createElement("div");
+    card.className = "week-card fade-up";
+    card.style.animationDelay = (wi * 0.06) + "s";
+    const wHeader = document.createElement("div");
+    wHeader.className = "week-header";
+    const unitNum = week.week || week.month || week.day || (wi + 1);
+    const unitName = plan.unit || "Minggu";
+    wHeader.innerHTML = `<div class="week-num">${unitNum}</div>
+    <div class="week-title">${unitName} ${unitNum} — ${week.theme}</div>
+    ${week.hours ? `<div class="week-hours"><svg viewBox="0 0 24 24"><use href="#ic-clock"/></svg>${week.hours}j</div>` : ""}
+    <svg class="week-toggle" viewBox="0 0 24 24"><use href="#ic-chevron-down"/></svg>`;
+    const body = document.createElement("div");
+    body.className = "week-body";
+    if (week.goals?.length) { const sec = document.createElement("div"); sec.innerHTML = `<div class="week-section-label">Tujuan</div>`; const tagList = document.createElement("div"); tagList.className = "tag-list"; week.goals.forEach(g => { const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = g; tagList.appendChild(tag); }); sec.appendChild(tagList); body.appendChild(sec); }
+    if (week.topics?.length) { const sec = document.createElement("div"); sec.innerHTML = `<div class="week-section-label">Topik</div>`; const tagList = document.createElement("div"); tagList.className = "tag-list"; week.topics.forEach(t => { const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = t; tagList.appendChild(tag); }); sec.appendChild(tagList); body.appendChild(sec); }
+    if (week.activities?.length) { const sec = document.createElement("div"); sec.innerHTML = `<div class="week-section-label">Aktivitas</div>`; week.activities.forEach(a => { const item = document.createElement("div"); item.className = "activity-item"; item.textContent = a; sec.appendChild(item); }); body.appendChild(sec); }
+    if (week.resources?.length) { const sec = document.createElement("div"); sec.innerHTML = `<div class="week-section-label">Sumber</div>`; week.resources.forEach(r => { const item = document.createElement("div"); item.className = "activity-item"; item.textContent = r; sec.appendChild(item); }); body.appendChild(sec); }
+    wHeader.onclick = () => { const open = body.style.display !== "none" && body.style.display !== ""; body.style.display = open ? "none" : "flex"; wHeader.querySelector(".week-toggle").style.transform = open ? "rotate(0)" : "rotate(180deg)"; };
+    card.appendChild(wHeader); card.appendChild(body); c.appendChild(card);
+  });
+  if (plan.tips?.length) { const sec = document.createElement("div"); sec.className = "resource-section fade-up"; sec.innerHTML = `<div class="resource-title"><svg viewBox="0 0 24 24"><use href="#ic-sparkle"/></svg>Tips Belajar Efektif</div>`; plan.tips.forEach(t => { const item = document.createElement("div"); item.className = "resource-item"; item.textContent = t; sec.appendChild(item); }); c.appendChild(sec); }
+}
+
+function resetForm(){
+
+  showModal(
+    "Hapus study plan ini?",
+    "Semua hasil study plan akan dihapus.",
+    () => {
+
+      localStorage.removeItem(
+        "studyplan-last-result"
+      );
+
+      document.getElementById("f-topic").value = "";
+      document.getElementById("f-goal").value = "";
+
+      show("form-area");
+    }
+  );
+
+}
+
+function copyPlan() {
+  const btn = document.querySelector(".copy-plan-btn");
+  const text = document.getElementById("plan-content").innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = `<svg viewBox="0 0 24 24"><use href="#ic-check"/></svg>Tersalin`;
+    setTimeout(() => { btn.innerHTML = `<svg viewBox="0 0 24 24"><use href="#ic-copy"/></svg>Salin Semua`; }, 2000);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  const savedPlan =
+    localStorage.getItem("studyplan-last-result");
+
+  if(savedPlan){
+
+    try{
+
+      const parsed = JSON.parse(savedPlan);
+
+      renderPlan(parsed);
+
+      show("result-wrap");
+
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+});
+function showModal(title, sub, onOk) {
+
+  const bd = document.createElement("div");
+
+  bd.style.cssText = `
+    position:fixed;
+    inset:0;
+    z-index:9999;
+
+    background:rgba(0,0,0,0.58);
+
+    backdrop-filter:blur(10px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    animation:fadeUp .18s ease;
+  `;
+
+  const box = document.createElement("div");
+
+  box.style.cssText = `
+    width:320px;
+    max-width:92%;
+
+    background:var(--card-bg);
+
+    border:1px solid var(--card-bdr);
+
+    border-radius:24px;
+
+    padding:26px 24px;
+
+    text-align:center;
+
+    backdrop-filter:blur(18px);
+
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.35);
+  `;
+
+  box.innerHTML = `
+
+    <div style="
+      width:58px;
+      height:58px;
+
+      margin:0 auto 18px;
+
+      border-radius:18px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      background:rgba(255,90,90,0.12);
+
+      border:1px solid rgba(255,90,90,0.22);
+
+      color:#ff6b6b;
+    ">
+
+      <svg xmlns="http://www.w3.org/2000/svg"
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+
+      </svg>
+
+    </div>
+
+    <div style="
+      font-family:'Playfair Display',serif;
+      font-size:1.22rem;
+      color:var(--txt-main);
+      margin-bottom:8px;
+      line-height:1.4;
+    ">
+      ${title}
+    </div>
+
+    <div style="
+      font-size:0.9rem;
+      color:var(--txt-sub);
+
+      opacity:0.82;
+
+      line-height:1.6;
+
+      margin-bottom:22px;
+    ">
+      ${sub}
+    </div>
+
+    <div style="
+      display:flex;
+      gap:12px;
+    ">
+
+      <button id="mc" style="
+        flex:1;
+
+        padding:12px;
+
+        border-radius:14px;
+
+        border:1px solid var(--chip-bdr);
+
+        background:var(--icon-btn-bg);
+
+        color:var(--txt-main);
+
+        font-size:0.92rem;
+
+        cursor:pointer;
+
+        transition:.18s;
+      ">
+        Batal
+      </button>
+
+      <button id="mo" style="
+        flex:1;
+
+        padding:12px;
+
+        border-radius:14px;
+
+        border:none;
+
+        background:
+          linear-gradient(
+            135deg,
+            #ff6b6b,
+            #d63031
+          );
+
+        color:#fff;
+
+        font-size:0.92rem;
+
+        cursor:pointer;
+
+        transition:.18s;
+      ">
+        Hapus
+      </button>
+
+    </div>
+  `;
+
+  bd.appendChild(box);
+
+  document.body.appendChild(bd);
+
+  const cancelBtn = box.querySelector("#mc");
+  const okBtn     = box.querySelector("#mo");
+
+  cancelBtn.onmouseenter = () => {
+    cancelBtn.style.background =
+      "var(--icon-btn-hover)";
+  };
+
+  cancelBtn.onmouseleave = () => {
+    cancelBtn.style.background =
+      "var(--icon-btn-bg)";
+  };
+
+  okBtn.onmouseenter = () => {
+    okBtn.style.opacity = ".88";
+  };
+
+  okBtn.onmouseleave = () => {
+    okBtn.style.opacity = "1";
+  };
+
+  cancelBtn.onclick = () => bd.remove();
+
+  okBtn.onclick = () => {
+    bd.remove();
+    onOk();
+  };
+
+  bd.onclick = e => {
+    if(e.target === bd) bd.remove();
+  };
+}
+
+lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="images/logo.png">
+  <title>NusanAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    [data-theme="dark"] {
+      --bg-overlay: rgba(8,8,16,0.65);
+      --accent: #7c6aff;
+      --accent-lt: #a99fff;
+      --accent-dk: #4a3acc;
+      --gold-a: #6c5ce7;
+      --gold-b: #4a3acc;
+      --txt-main: #f0eeff;
+      --txt-sub: #c8c0f0;
+      --card-bg: rgba(124,106,255,0.06);
+      --card-bdr: rgba(124,106,255,0.18);
+      --chip-bdr: rgba(124,106,255,0.22);
+      --chip-txt: #a99fff;
+      --header-txt: #c4b9ff;
+      --icon-btn-bg: rgba(124,106,255,0.09);
+      --icon-btn-hover: rgba(124,106,255,0.18);
+      --scrollbar: rgba(124,106,255,0.28);
+      --input-bg: rgba(20,18,40,0.6);
+      --input-bdr: rgba(124,106,255,0.22);
+      --input-txt: #f0eeff;
+      --input-ph: rgba(124,106,255,0.38);
+      --sidebar-bg: rgba(8,8,20,0.92);
+      --sidebar-bdr: rgba(124,106,255,0.18);
+      --tooltip-bg: rgba(30,28,58,0.97);
+      --copy-bg: rgba(124,106,255,0.12);
+    }
+    [data-theme="light"] {
+      --bg-overlay: rgba(235,230,255,0.65);
+      --accent: #5b4fcf;
+      --accent-lt: #3d2fa0;
+      --accent-dk: #7c6aff;
+      --gold-a: #6c5ce7;
+      --gold-b: #4a3acc;
+      --txt-main: #1a1640;
+      --txt-sub: #2e2860;
+      --card-bg: rgba(255,255,255,0.62);
+      --card-bdr: rgba(91,79,207,0.2);
+      --chip-bdr: rgba(91,79,207,0.28);
+      --chip-txt: #4a3acc;
+      --header-txt: #4a3acc;
+      --icon-btn-bg: rgba(91,79,207,0.09);
+      --icon-btn-hover: rgba(91,79,207,0.18);
+      --scrollbar: rgba(91,79,207,0.28);
+      --input-bg: rgba(255,255,255,0.65);
+      --input-bdr: rgba(91,79,207,0.28);
+      --input-txt: #1a1640;
+      --input-ph: rgba(91,79,207,0.4);
+      --sidebar-bg: rgba(240,238,255,0.96);
+      --sidebar-bdr: rgba(91,79,207,0.18);
+      --tooltip-bg: rgba(255,255,255,0.97);
+      --copy-bg: rgba(91,79,207,0.1);
+    }
+
+    html, body { height:100%; margin:0; overflow:hidden; font-family: 'Inter', sans-serif; }
+    #welcome h1 { font-family: 'Space Grotesk', sans-serif; }
+
+    /* ========== SIDEBAR - DENGAN ANIMASI (sama seperti index) ========== */
+    #sidebar {
+      position: fixed; left:0; top:0; bottom:0;
+      width: 56px; background: var(--sidebar-bg);
+      backdrop-filter: blur(20px); border-right: 1px solid var(--sidebar-bdr);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0; gap: 4px; z-index: 100;
+      transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
+      overflow: visible;
+    }
+    #sidebar.expanded { width: 220px; }
+
+    #sidebar-toggle {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid var(--chip-bdr); background: var(--icon-btn-bg);
+      color: var(--chip-txt); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; margin-bottom: 8px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #sidebar-toggle:hover { background:var(--icon-btn-hover); border-color:var(--accent); }
+
+    .sidebar-divider {
+      width: 32px; height: 1px;
+      background: var(--sidebar-bdr);
+      margin: 4px 0;
+      transition: width 0.28s;
+    }
+    #sidebar.expanded .sidebar-divider { width: 180px; }
+
+    .nav-item {
+      position: relative; overflow: visible; width: 36px; height: 36px; border-radius: 10px;
+      border: 1px solid transparent; background: transparent;
+      color: var(--chip-txt); display: flex; align-items: center;
+      cursor: pointer; text-decoration: none;
+      flex-shrink: 0; white-space: nowrap; padding: 0 10px; gap: 12px;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, width 0.28s;
+    }
+    .nav-item:hover { background: var(--icon-btn-hover); border-color: var(--accent); color: var(--accent); }
+    .nav-item.active { background: var(--copy-bg); border-color: var(--accent); color: var(--accent); }
+    #sidebar.expanded .nav-item { width: 192px; }
+
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; }
+    .nav-label { font-size: 0.82rem; font-weight: 500; opacity: 0; transition: opacity 0.18s; font-family: 'Inter', sans-serif;}
+    #sidebar.expanded .nav-label { opacity: 1; pointer-events: auto; }
+
+    .nav-tooltip {
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--tooltip-bg);
+      border: 1px solid var(--chip-bdr);
+      color: var(--chip-txt);
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      font-weight: 500;
+    }
+    #sidebar:not(.expanded) .nav-item:hover .nav-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+    #sidebar.expanded .nav-tooltip { display: none; }
+
+    .sidebar-bottom { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding: 0 10px; }
+    #mainContainer { margin-left: 56px; transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1); }
+    body.sidebar-open #mainContainer { margin-left: 220px; }
+
+    /* ========== COMPARE STYLES ========== */
+    #main-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar) transparent;
+    }
+    #main-scroll::-webkit-scrollbar { width: 4px; }
+    #main-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 99px; }
+
+    .compare-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 24px;
+    }
+
+    .input-box {
+  width: 100%;
+  font-family: Inter, sans-serif !important;
+  background: var(--input-bg);
+  border: 1px solid var(--input-bdr);
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: var(--input-txt);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  outline: none;
+  box-sizing: border-box;
+  resize: none;
+  line-height: 1.5;
+  max-height: 160px;
+  overflow-y: auto;   /* ← ini saja, hapus overflow: hidden */
+}
+    .input-box::placeholder { color: var(--input-ph); }
+    #question {
+  color: var(--input-txt);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding:0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+    .compare-btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold-a), var(--gold-b));
+      color: white;
+      font-family: 'Playfair Display', serif;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .compare-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .compare-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-bdr);
+      border-radius: 18px;
+      padding: 18px;
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--accent-lt);
+    }
+    .card-body {
+      color: var(--txt-sub);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .card-body strong { color: var(--accent-lt); }
+    .card-body ul { margin: 6px 0; padding-left: 18px; }
+    .card-body li { margin: 3px 0; line-height: 1.6; }
+    
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      border: 1px solid var(--chip-bdr);
+      color: var(--chip-txt);
+      background: rgba(124,106,255,0.08);
+    }
+    #evaluation-box {
+      background: rgba(124,106,255,0.08);
+      border: 1px solid rgba(124,106,255,0.18);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 14px 14px 0;
+      padding: 16px 18px;
+      color: var(--txt-sub);
+      line-height: 1.7;
+    }
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 60px 0;
+    }
+    .loading-dots { display: flex; gap: 8px; }
+    .loading-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.4;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+    @media (max-width: 900px) { .results-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+
+<body class="relative">
+
+<div class="absolute inset-0">
+  <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0a0a1a,#12102a,#0d0a1f);"></div>
+</div>
+<div class="absolute inset-0" style="background:var(--bg-overlay);"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <button id="sidebar-toggle" onclick="toggleSidebar()" title="Open / Close Sidebar">
+    <i data-lucide="panel-left" style="width:16px;height:16px;"></i>
+  </button>
+  <div class="sidebar-divider"></div>
+
+  <a href="index.html" class="nav-item">
+    <i data-lucide="message-circle"></i>
+    <span class="nav-label">Chat</span>
+    <span class="nav-tooltip">Chat</span>
+  </a>
+  <a href="quiz.html" class="nav-item">
+    <i data-lucide="brain"></i>
+    <span class="nav-label">Quiz</span>
+    <span class="nav-tooltip">Quiz</span>
+  </a>
+  <a href="studyplan.html" class="nav-item">
+    <i data-lucide="calendar"></i>
+    <span class="nav-label">Study Plan</span>
+    <span class="nav-tooltip">Study Plan</span>
+  </a>
+  <a href="evaluator.html" class="nav-item">
+    <i data-lucide="clipboard-check"></i>
+    <span class="nav-label">Evaluator</span>
+    <span class="nav-tooltip">Evaluator</span>
+  </a>
+  <a href="compare.html" class="nav-item active">
+    <i data-lucide="git-compare"></i>
+    <span class="nav-label">Compare Prompt</span>
+    <span class="nav-tooltip">Compare Prompt</span>
+  </a>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-divider"></div>
+    <button class="nav-item" onclick="toggleTheme()" style="border:none;">
+      <span id="theme-icon" style="display:inline-flex;align-items:center;">
+        <i data-lucide="sun" style="width:16px;height:16px;"></i>
+      </span>
+      <span class="nav-label">Change Theme</span>
+      <span class="nav-tooltip">Change Theme</span>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="relative flex flex-col" id="mainContainer" style="height:100vh;">
+  <div id="main-scroll" style="flex:1;overflow-y:auto;">
+    <div class="compare-wrap">
+
+      <div style="text-align:center;">
+        <div style="font-family: 'Space Grotesk', sans-serif;font-size:1.7rem;color:var(--txt-main);">
+          Prompt Comparison Engine
+        </div>
+        <div style="margin-top:8px;color:var(--chip-txt);opacity:0.7;font-size:0.88rem;">
+          Analyze how different prompting techniques affect AI responses
+        </div>
+      </div>
+
+      <textarea 
+  id="question" 
+  rows="1" 
+  placeholder="Enter a question or topic to compare..."
+  style="
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--input-bdr);
+    border-radius: 14px;
+    padding: 14px 18px;
+    color: var(--input-txt);
+    font-family: Inter, sans-serif;
+    font-size: 0.92rem;
+    outline: none;
+    box-sizing: border-box;
+    resize: none;
+    line-height: 1.5;
+    max-height: 160px;
+    overflow-y: auto;
+    display: block;
+  ">
+</textarea>
+
+      <!-- Ganti div tombol yang sekarang: -->
+      <div style="display:flex;justify-content:center;gap:10px;">
+        <button class="compare-btn" onclick="runCompare()">Compare Prompts</button>
+        <button class="compare-btn" id="new-btn" onclick="newCompare()"
+          style="display:none;background:var(--icon-btn-bg);border:1px solid var(--chip-bdr);color:var(--chip-txt);">
+          New Compare
+        </button>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div>
+        <div style="color:var(--chip-txt);opacity:0.7;">Comparing AI prompt performance...</div>
+      </div>
+
+      <div id="results" style="display:none;flex-direction:column;gap:18px;">
+        <div class="results-grid">
+          <div class="compare-card">
+            <div class="badge">Zero-Shot Prompting</div>
+            <div class="card-title">Direct Response</div>
+            <div class="card-body" id="zero-shot"></div>
+          </div>
+          <div class="compare-card">
+            <div class="badge">Structured Prompting</div>
+            <div class="card-title">Structured Output</div>
+            <div class="card-body" id="structured"></div>
+          </div>
+          <div class="compare-card">
+            <div class="badge">Few-Shot Prompting</div>
+            <div class="card-title">Example-Guided</div>
+            <div class="card-body" id="few-shot"></div>
+          </div>
+        </div>
+        <div id="evaluation-box">
+          <div style="font-size:0.75rem;font-weight:500;color:var(--accent-lt);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">
+            AI Analysis
+          </div>
+          <div id="conclusion-text" style="font-size:0.88rem;line-height:1.7;color:var(--txt-sub);"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== SIDEBAR ==========
+let sidebarOpen = localStorage.getItem("sidebar-open") === "true";
+function applySidebar() {
+  const sb = document.getElementById("sidebar");
+  if (sidebarOpen) { sb.classList.add("expanded"); document.body.classList.add("sidebar-open"); }
+  else { sb.classList.remove("expanded"); document.body.classList.remove("sidebar-open"); }
+}
+function toggleSidebar() { sidebarOpen = !sidebarOpen; localStorage.setItem("sidebar-open", sidebarOpen); applySidebar(); }
+applySidebar();
+
+// ========== THEME ==========
+let currentTheme = localStorage.getItem("learnai-theme") || "dark";
+document.documentElement.setAttribute("data-theme", currentTheme);
+
+function toggleTheme() {
+  const themeIconSpan = document.getElementById("theme-icon");
+  if (themeIconSpan) {
+    themeIconSpan.style.transform = "rotate(180deg) scale(0)";
+    themeIconSpan.style.opacity = "0";
+    setTimeout(() => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", currentTheme);
+      localStorage.setItem("learnai-theme", currentTheme);
+      const newIcon = currentTheme === "dark" ? "sun" : "moon";
+      themeIconSpan.innerHTML = `<i data-lucide="${newIcon}" style="width:16px;height:16px;"></i>`;
+      themeIconSpan.style.transition = "none";
+      themeIconSpan.style.transform = "rotate(-180deg) scale(0)";
+      themeIconSpan.style.opacity = "0";
+      lucide.createIcons();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          themeIconSpan.style.transition = "transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.3s";
+          themeIconSpan.style.transform = "rotate(0deg) scale(1)";
+          themeIconSpan.style.opacity = "1";
+        });
+      });
+    }, 200);
+  } else {
+    currentTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    localStorage.setItem("learnai-theme", currentTheme);
+    lucide.createIcons();
+  }
+}
+
+// ── Auto-resize textarea ──
+const questionEl = document.getElementById("question");
+
+questionEl.addEventListener("input", () => {
+  questionEl.style.height = "auto";
+  questionEl.style.height = questionEl.scrollHeight + "px";
+});
+
+// ========== SAVE & LOAD RESULT ==========
+function saveResult(question, data) {
+  localStorage.setItem("compare-last", JSON.stringify({
+    question,
+    zero_shot:  data.results.zero_shot  || "",
+    structured: data.results.structured || "",
+    few_shot:   data.results.few_shot   || "",
+    analysis:   data.analysis           || ""
+  }));
+}
+
+function loadResult() {
+  const saved = localStorage.getItem("compare-last");
+  if (!saved) return;
+
+  try {
+    const d = JSON.parse(saved);
+    document.getElementById("question").value          = d.question   || "";
+    document.getElementById("zero-shot").innerHTML   = formatMarkdown(d.zero_shot  || "");
+    document.getElementById("structured").innerHTML  = formatMarkdown(d.structured || "");
+    document.getElementById("few-shot").innerHTML    = formatMarkdown(d.few_shot   || "");
+    document.getElementById("conclusion-text").innerHTML = formatMarkdown(d.analysis || "");
+    document.getElementById("results").style.display   = "flex";
+    document.getElementById("new-btn").style.display = "inline-flex";
+    document.querySelector(".compare-btn").style.display = "none";
+  } catch(e) {
+    localStorage.removeItem("compare-last");
+  }
+}
+
+// output
+function formatMarkdown(text) {
+  return text
+    // Headers **text:** → bold heading
+    .replace(/\*\*(.+?):\*\*/g, '<strong style="color:var(--accent-lt);display:block;margin-top:12px;margin-bottom:4px;">$1</strong>')
+    // Bold **text**
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // Bullet points: lines starting with * or - 
+    .replace(/^[\*\-]\s+(.+)$/gm, '<li style="margin:3px 0;padding-left:4px;">$1</li>')
+    // Wrap consecutive <li> in <ul>
+    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, m => `<ul style="margin:6px 0;padding-left:18px;list-style:disc;">${m}</ul>`)
+    // Numbered list: 1. text
+    .replace(/^\d+\.\s+(.+)$/gm, '<li style="margin:3px 0;padding-left:4px;">$1</li>')
+    // Line breaks
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+
+// ========== COMPARE LOGIC ==========
+async function runCompare() {
+  const question = document.getElementById("question").value.trim();
+  if (!question) { alert("Please enter a question first"); return; }
+
+  document.getElementById("loading").style.display = "flex";
+  document.getElementById("results").style.display = "none";
+
+  try {
+    const res = await fetch("/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById("zero-shot").innerHTML  = formatMarkdown(data.results.zero_shot  || "-");
+    document.getElementById("structured").innerHTML = formatMarkdown(data.results.structured || "-");
+    document.getElementById("few-shot").innerHTML   = formatMarkdown(data.results.few_shot   || "-");
+
+    const conclusionEl = document.getElementById("conclusion-text");
+    if (conclusionEl) conclusionEl.innerHTML = formatMarkdown(data.analysis || "");
+
+    // ← simpan ke localStorage
+    saveResult(question, data);
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("results").style.display = "flex";
+    document.getElementById("new-btn").style.display = "inline-flex";
+    document.querySelector(".compare-btn").style.display = "none";
+  } catch (err) {
+    document.getElementById("loading").style.display = "none";
+    alert("Failed to compare prompts. Please try again");
+  }
+}
+
+function newCompare() {
+  localStorage.removeItem("compare-last");
+  document.getElementById("question").value = "";
+  questionEl.style.height = "auto";
+  document.getElementById("results").style.display = "none";
+  document.getElementById("new-btn").style.display = "none";
+    document.querySelector(".compare-btn").style.display = "inline-flex";
+  questionEl.focus();
+}
+
+questionEl.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    runCompare();
+  }
+});
+
+// ← load saat halaman dibuka
+loadResult();
+
+lucide.createIcons();
+</script>
+</body>
+</html>
